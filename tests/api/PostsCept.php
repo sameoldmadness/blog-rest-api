@@ -2,8 +2,6 @@
 
 use \Codeception\Util\HttpCode;
 
-DB::enableQueryLog();
-// print_r(DB::getQueryLog());
 $I = new ApiTester($scenario);
 
 $I->wantTo('create a post');
@@ -48,8 +46,6 @@ $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'count' => 1,
 ]);
-
-// ['trending', 'cats']
 
 $I->wantTo('fetch all posts by tag');
 $I->sendGET("/posts?tag[]=trending");
@@ -97,7 +93,7 @@ $I->seeResponseContainsJson([
 ]);
 
 $I->wantTo('count all posts by too many tags');
-$I->sendGET("/posts/count?tag[]=trending&tag[]=cats&tag=immposibru");
+$I->sendGET("/posts/count?tag[]=trending&tag[]=cats&tag[]=immposibru");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'count' => 0,
