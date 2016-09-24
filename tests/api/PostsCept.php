@@ -2,6 +2,8 @@
 
 use \Codeception\Util\HttpCode;
 
+DB::enableQueryLog();
+// print_r(DB::getQueryLog());
 $I = new ApiTester($scenario);
 
 $I->wantTo('create a post');
@@ -101,19 +103,6 @@ $I->seeResponseContainsJson([
     'count' => 0,
 ]);
 
-$I->wantTo('overwrite the post');
-$I->sendPUT("/posts/$postId", [
-    'title' => 'Another post title',
-]);
-$I->seeResponseCodeIs(HttpCode::OK);
-$I->sendGET("/posts/$postId");
-$I->seeResponseCodeIs(HttpCode::OK);
-$I->seeResponseContainsJson([
-    'title' => 'Another post title',
-    'body' => '',
-    'tags' => [],
-]);
-
 $I->wantTo('modify the post');
 $I->sendPatch("/posts/$postId", [
     'body' => 'Another post body',
@@ -122,31 +111,37 @@ $I->seeResponseCodeIs(HttpCode::OK);
 $I->sendGET("/posts/$postId");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
-    'title' => 'Another post title',
-    'body' => 'Another post body',
-    'tags' => [],
+    'post' => [
+        'title' => 'Post title',
+        'body' => 'Another post body',
+        'tags' => ['trending', 'cats'],
+    ]
 ]);
 
 $I->wantTo('add tag to the post');
-$I->sendPOST("/posts/$postId/tags/cats");
+$I->sendPOST("/posts/$postId/tags/fizzbuzz");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->sendGET("/posts/$postId");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
-    'tags' => ['cats'],
+    'post' => [
+        'tags' => ['trending', 'cats', 'fizzbuzz'],
+    ],
 ]);
 
 $I->wantTo('remove tag from the post');
-$I->sendDELETE("/posts/$postId/tags/cats");
+$I->sendDELETE("/posts/$postId/tags/fizzbuzz");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->sendGET("/posts/$postId");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
-    'tags' => [],
+    'post' => [
+        'tags' => ['trending', 'cats'],
+    ],
 ]);
 
 $I->wantTo('delete the post');
-$I->sendDelete("/posts/$postId");
+$I->sendDELETE("/posts/$postId");
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->sendGET("/posts/$postId");
 $I->seeResponseCodeIs(HttpCode::NOT_FOUND);
