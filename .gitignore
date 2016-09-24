@@ -10,3 +10,5 @@ Homestead.yaml
 # Test task
 /task.md
 /todo.md
+
+tests/_output/*
