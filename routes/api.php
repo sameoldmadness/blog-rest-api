@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Post;
+use App\Mail\PostCreated;
 
 Route::get('/ping', function () {
 	return 'pong';
@@ -10,6 +11,9 @@ Route::get('/ping', function () {
 Route::post('/posts', function (Request $request) {
     $payload = $request->all();
     $post = Post::create($request->all());
+
+    $email = config('mail.admin');
+    Mail::to($email)->queue(new PostCreated($post));
 
     return ['post' => ['id' => $post->id]];
 });
@@ -49,5 +53,6 @@ Route::delete('/posts/{post}/tags/{tag}', function (post $post, string $tag) {
 
 Route::delete('/posts/{post}', function (int $postId) {
     Post::destroy($postId);
+
     Log::info("Post deleted: $postId");
 });

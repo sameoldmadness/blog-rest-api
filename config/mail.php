@@ -112,4 +112,5 @@ return [
 
     'sendmail' => '/usr/sbin/sendmail -bs',
 
+    'admin' => env('MAIL_ADMIN'),
 ];
