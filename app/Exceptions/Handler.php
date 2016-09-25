@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -47,9 +48,17 @@ class Handler extends ExceptionHandler
         if ($request->is('api/*')) {
             $exception = $this->prepareException($exception);
 
+            if ($exception instanceof HttpException) {
+                return response()->json([
+                    'message' => $exception->getMessage(),
+                ], $exception->getStatusCode());
+            }
+
             return response()->json([
-                'message' => $exception->getMessage(),
-            ], $exception->getStatusCode());
+                'message' => \App::environment('local')
+                    ? $exception->getMessage()
+                    : 'Something goes wrong',
+            ], 500);
         }
 
         return parent::render($request, $exception);

@@ -49,4 +49,5 @@ Route::delete('/posts/{post}/tags/{tag}', function (post $post, string $tag) {
 
 Route::delete('/posts/{post}', function (int $postId) {
     Post::destroy($postId);
+    Log::info("Post deleted: $postId");
 });
