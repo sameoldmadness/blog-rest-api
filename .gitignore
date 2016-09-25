@@ -11,4 +11,6 @@ Homestead.yaml
 /task.md
 /todo.md
 
+# Development
+/.vagrant
 tests/_output/*
