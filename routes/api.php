@@ -20,14 +20,20 @@ Route::post('/posts', function (Request $request) {
 
 Route::get('/posts', function (Request $request) {
     $tags = $request->input('tag');
-    $posts = Post::whereContainsTags($tags)->get();
+    $cacheKey = 'posts.' . json_encode($tags);
+    $posts = Cache::remember($cacheKey, config('cache.ttl'), function() use ($tags) {
+        return Post::whereContainsTags($tags)->get();
+    });
 
     return ['posts' => $posts];
 });
 
 Route::get('/posts/count', function (Request $request) {
     $tags = $request->input('tag');
-    $count = Post::whereContainsTags($tags)->count();
+    $cacheKey = 'posts.count.' . json_encode($tags);
+    $count = Cache::remember($cacheKey, config('cache.ttl'), function() use ($tags) {
+        return Post::whereContainsTags($tags)->count();
+    });
 
     return ['count' => $count];
 });
